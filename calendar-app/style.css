@@ -1,0 +1,41 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#calendar {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Style for the Today button */
+.fc-today-button {
+    background-color: #4CAF50 !important;
+    border-color: #4CAF50 !important;
+    color: white !important;
+    padding: 8px 16px !important;
+    border-radius: 4px !important;
+}
+
+/* Style for the navigation buttons */
+.fc-button {
+    background-color: #2196F3 !important;
+    border-color: #2196F3 !important;
+    color: white !important;
+    padding: 8px 16px !important;
+    border-radius: 4px !important;
+}
+
+.fc-button:hover {
+    background-color: #1976D2 !important;
+    border-color: #1976D2 !important;
+}
