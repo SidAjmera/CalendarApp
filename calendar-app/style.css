@@ -39,3 +39,163 @@ h1 {
     background-color: #1976D2 !important;
     border-color: #1976D2 !important;
 }
+
+/* Modal styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 300px;
+  border-radius: 8px;
+  position: relative;
+}
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 5px;
+}
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+#eventForm label {
+  display: block;
+  margin-bottom: 10px;
+}
+#eventForm input, #eventForm textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 2px;
+  margin-bottom: 8px;
+}
+#eventForm button {
+  width: 100%;
+  padding: 8px;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+#eventForm button:hover {
+  background: #1565c0;
+}
+
+#clearAllBtnContainer {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2000;
+  width: 44px;
+  height: 44px;
+}
+#clearAllBtn {
+  display: none;
+  width: 110px;
+  height: 32px;
+  font-size: 13px;
+  padding: 0 10px;
+  background: #d32f2f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  opacity: 0;
+  transition: opacity 0.2s;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+#clearAllBtnContainer:hover #clearAllBtn {
+  display: block;
+  opacity: 1;
+}
+
+/* Print styles */
+@media print {
+  /* Hide all UI elements except the calendar */
+  #profileBar, #profileActions, #exportIcalBtn, #printCalendarBtn, #importIcalBtn, #clearAllBtnContainer {
+    display: none !important;
+  }
+  
+  /* Remove shadows and borders for cleaner print */
+  #calendar {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+  
+  /* Ensure events don't break across pages */
+  .fc-event {
+    page-break-inside: avoid !important;
+  }
+  
+  /* Ensure month views don't break awkwardly */
+  .fc-month-view {
+    page-break-after: auto !important;
+  }
+  
+  /* Optimize text for printing */
+  .fc-event-title {
+    font-size: 12px !important;
+  }
+  
+  /* Remove background colors that don't print well */
+  .fc-daygrid-day {
+    background: white !important;
+  }
+  
+  /* Ensure proper spacing */
+  .fc-daygrid-day-frame {
+    min-height: 80px !important;
+  }
+  
+  /* Hide today indicator for print */
+  .fc-day-today {
+    background: #f8f9fa !important;
+  }
+  
+  /* Ensure calendar takes full width */
+  #calendar {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10px !important;
+  }
+  
+  /* Hide FullCalendar toolbar for print */
+  .fc-toolbar {
+    display: none !important;
+  }
+  
+  /* Add header for print */
+  #calendar::before {
+    content: "Calendar - " attr(data-current-view) " - " attr(data-current-date);
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-bottom: 2px solid #333;
+  }
+}
