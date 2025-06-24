@@ -1,4 +1,108 @@
 document.addEventListener('DOMContentLoaded', function() {
+     // Theme management
+     let isDarkMode = true; // Default to dark mode
+     let currentProfile = null;
+     let currentSubprofile = null;
+     let showingAllSubprofiles = false;
+
+     function toggleTheme() {
+         isDarkMode = !isDarkMode;
+         const body = document.body;
+         const themeBtn = document.getElementById('themeToggleBtn');
+         
+         if (isDarkMode) {
+             body.classList.remove('light-mode');
+             themeBtn.textContent = '🌙 Dark';
+             themeBtn.style.background = '#333';
+             
+             // Update button colors to dark theme
+             const buttons = [
+                 'showAllSubprofilesBtn', 'logoutBtn', 'createProfileBtn', 
+                 'createSubprofileBtn', 'exportIcalBtn', 'importIcalBtn', 'printCalendarBtn'
+             ];
+             buttons.forEach(id => {
+                 const btn = document.getElementById(id);
+                 if (btn) btn.style.background = '#333';
+             });
+             
+             // Update select elements
+             const selects = ['profileSelect', 'subprofileSelect'];
+             selects.forEach(id => {
+                 const select = document.getElementById(id);
+                 if (select) {
+                     select.style.background = '#1a1a1a';
+                     select.style.color = '#fff';
+                     select.style.border = '1px solid #333';
+                 }
+             });
+         } else {
+             body.classList.add('light-mode');
+             themeBtn.textContent = '☀️ Light';
+             themeBtn.style.background = '#1976d2';
+             
+             // Update button colors to light theme
+             const buttons = [
+                 'showAllSubprofilesBtn', 'logoutBtn', 'createProfileBtn', 
+                 'createSubprofileBtn', 'exportIcalBtn', 'importIcalBtn', 'printCalendarBtn'
+             ];
+             buttons.forEach(id => {
+                 const btn = document.getElementById(id);
+                 if (btn) btn.style.background = '#1976d2';
+             });
+             
+             // Update select elements
+             const selects = ['profileSelect', 'subprofileSelect'];
+             selects.forEach(id => {
+                 const select = document.getElementById(id);
+                 if (select) {
+                     select.style.background = '#fff';
+                     select.style.color = '#333';
+                     select.style.border = '1px solid #ddd';
+                 }
+             });
+         }
+         
+         // Save theme preference
+         localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+     }
+
+     function loadThemePreference() {
+         const savedTheme = localStorage.getItem('theme');
+         if (savedTheme === 'light') {
+             isDarkMode = false;
+             document.body.classList.add('light-mode');
+             document.getElementById('themeToggleBtn').textContent = '☀️ Light';
+             document.getElementById('themeToggleBtn').style.background = '#1976d2';
+             
+             // Update button colors to light theme
+             const buttons = [
+                 'showAllSubprofilesBtn', 'logoutBtn', 'createProfileBtn', 
+                 'createSubprofileBtn', 'exportIcalBtn', 'importIcalBtn', 'printCalendarBtn'
+             ];
+             buttons.forEach(id => {
+                 const btn = document.getElementById(id);
+                 if (btn) btn.style.background = '#1976d2';
+             });
+             
+             // Update select elements
+             const selects = ['profileSelect', 'subprofileSelect'];
+             selects.forEach(id => {
+                 const select = document.getElementById(id);
+                 if (select) {
+                     select.style.background = '#fff';
+                     select.style.color = '#333';
+                     select.style.border = '1px solid #ddd';
+                 }
+             });
+         }
+     }
+
+     // Initialize theme
+     loadThemePreference();
+     
+     // Theme toggle event listener
+     document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+
      const calendarEl = document.getElementById('calendar');
      
      const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -13,7 +117,8 @@ document.addEventListener('DOMContentLoaded', function() {
          // Show today's date
          nowIndicator: true,
          // Make the calendar responsive
-         height: 'auto',
+         height: '100%',
+         expandRows: true, // this is key to make the cells fill the height
          // Add some basic styling
          themeSystem: 'standard',
          // Customize button text
@@ -377,10 +482,6 @@ document.addEventListener('DOMContentLoaded', function() {
      const logoutBtn = document.getElementById('logoutBtn');
      const showAllSubprofilesBtn = document.getElementById('showAllSubprofilesBtn');
 
-     let currentProfile = null;
-     let currentSubprofile = null;
-     let showingAllSubprofiles = false;
-
      function getProfiles() {
        return JSON.parse(localStorage.getItem('calendarProfiles') || '[]');
      }
@@ -396,9 +497,16 @@ document.addEventListener('DOMContentLoaded', function() {
        showAllSubprofilesBtn.style.display = 'none';
      }
      function updateCalendarDropdown(profile) {
-       subprofileSelect.innerHTML = '<option value="">Select Calendar</option>' + (profile.subprofiles||[]).map(s => `<option value="${s}">${s}</option>`).join('');
+       subprofileSelect.innerHTML = '<option value="">Select Calendar</option>' + 
+           (profile.subprofiles||[]).map(s => `<option value="${s}">${s}</option>`).join('');
        subprofileSelect.disabled = false;
-       showAllSubprofilesBtn.style.display = profile.subprofiles && profile.subprofiles.length > 1 ? '' : 'none';
+       
+       // Update Show All Calendars button visibility
+       const hasMultipleCalendars = profile.subprofiles && profile.subprofiles.length > 1;
+       showAllSubprofilesBtn.style.display = hasMultipleCalendars ? '' : 'none';
+       
+       // Reset showing all state when switching profiles
+       showingAllSubprofiles = false;
      }
      function clearCalendarEvents() {
        calendar.getEvents().forEach(ev => ev.remove());
@@ -426,13 +534,13 @@ document.addEventListener('DOMContentLoaded', function() {
          const events = (prof.events && prof.events[subprofile]) || [];
          const color = colors[index % colors.length];
          events.forEach(event => {
-           const eventWithSubprofile = {
+           calendar.addEvent({
              ...event,
              title: `[${subprofile}] ${event.title}`,
              backgroundColor: color,
-             borderColor: color
-           };
-           calendar.addEvent(eventWithSubprofile);
+             borderColor: color,
+             textColor: '#fff'
+           });
          });
        });
      }
@@ -496,12 +604,18 @@ document.addEventListener('DOMContentLoaded', function() {
        currentSubprofile = sub;
        showingAllSubprofiles = false;
        loadEventsForCurrent();
+       
+       // Update UI to show inactive state for show all button
+       showAllSubprofilesBtn.classList.remove('active');
      };
      showAllSubprofilesBtn.onclick = function() {
        showingAllSubprofiles = true;
        currentSubprofile = null;
        subprofileSelect.value = '';
        loadAllCalendarEvents();
+       
+       // Update UI to show active state
+       showAllSubprofilesBtn.classList.add('active');
      };
      logoutBtn.onclick = function() {
        currentProfile = null;
@@ -799,27 +913,6 @@ document.addEventListener('DOMContentLoaded', function() {
      // On load
      updateProfileDropdown();
      
-     // Clear All Data button logic
-     const clearAllBtn = document.getElementById('clearAllBtn');
-     clearAllBtn.onclick = function() {
-        const password = prompt('Enter admin password to clear all data:');
-        if (password === 'abceddc') {
-            // Remove all profiles from localStorage
-            localStorage.removeItem('calendarProfiles');
-            // Remove all events from calendar
-            calendar.getEvents().forEach(ev => ev.remove());
-            // Reset current profile and subprofile
-            currentProfile = null;
-            currentSubprofile = null;
-            showingAllSubprofiles = false;
-            // Update UI
-            updateProfileDropdown();
-            alert('All calendar data has been cleared.');
-        } else if (password !== null) {
-            alert('Incorrect password. Data was not cleared.');
-        }
-     };
-     
      // Print Calendar functionality
      const printCalendarBtn = document.getElementById('printCalendarBtn');
      printCalendarBtn.onclick = function() {
@@ -853,4 +946,17 @@ document.addEventListener('DOMContentLoaded', function() {
             window.print();
         }, 100);
      };
- });
+
+     // Event listeners
+     loadProfiles();
+     updateProfileSelect();
+     updateSubprofileSelect();
+     
+     // Initialize calendar and load events
+     calendar.render();
+     loadEventsFromLocalStorage();
+
+     // Update calendar options for better viewport usage
+     calendar.setOption('height', '100%');
+     calendar.setOption('expandRows', true);
+});

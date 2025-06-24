@@ -1,3 +1,15 @@
+/* Dark mode (default) */
+body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -6,196 +18,404 @@
 
 h1 {
     text-align: center;
-    color: #333;
+    color: #ffffff;
     margin-bottom: 20px;
 }
 
+/* Header section containing all buttons */
+.header-section {
+    flex-shrink: 0;
+}
+
+#profileBar, #profileActions {
+    margin: 8px 16px !important;
+}
+
+.action-buttons {
+    margin: 0 16px 8px !important;
+    display: flex;
+    gap: 8px;
+}
+
+/* Calendar container */
 #calendar {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    background: #121212;
+    padding: 16px 24px;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Style for the Today button */
-.fc-today-button {
-    background-color: #4CAF50 !important;
-    border-color: #4CAF50 !important;
-    color: white !important;
-    padding: 8px 16px !important;
-    border-radius: 4px !important;
+/* Make the calendar grid fill the available space */
+.fc {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Style for the navigation buttons */
+.fc-view-harness {
+    flex: 1 !important;
+    min-height: 0 !important;
+}
+
+.fc-view {
+    height: 100% !important;
+}
+
+.fc-scroller {
+    height: 100% !important;
+}
+
+.fc-daygrid {
+    height: 100% !important;
+}
+
+.fc .fc-daygrid-body {
+    height: 100% !important;
+}
+
+.fc .fc-daygrid-body table {
+    height: 100% !important;
+}
+
+/* Ensure day cells expand to fill space */
+.fc .fc-daygrid-day-frame {
+    height: 100% !important;
+    min-height: unset !important;
+}
+
+.fc-toolbar {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+}
+
 .fc-button {
-    background-color: #2196F3 !important;
-    border-color: #2196F3 !important;
-    color: white !important;
+    background-color: #333 !important;
+    border-color: #333 !important;
+    color: #ffffff !important;
     padding: 8px 16px !important;
     border-radius: 4px !important;
 }
 
 .fc-button:hover {
-    background-color: #1976D2 !important;
-    border-color: #1976D2 !important;
+    background-color: #444 !important;
+    border-color: #444 !important;
+}
+
+.fc-button-active {
+    background-color: #666 !important;
+    border-color: #666 !important;
+}
+
+.fc-daygrid-day {
+    background-color: #121212 !important;
+    border-color: #333 !important;
+}
+
+.fc-daygrid-day-number {
+    color: #ffffff !important;
+}
+
+.fc-col-header-cell {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    border-color: #333 !important;
+}
+
+.fc-col-header-cell-cushion {
+    color: #ffffff !important;
+}
+
+.fc-event {
+    border-color: #333 !important;
+}
+
+.fc-event-title {
+    color: #ffffff !important;
 }
 
 /* Modal styles */
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.4);
-}
-.modal-content {
-  background-color: #fff;
-  margin: 10% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 300px;
-  border-radius: 8px;
-  position: relative;
-}
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-  position: absolute;
-  right: 10px;
-  top: 5px;
-}
-.close:hover,
-.close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-}
-#eventForm label {
-  display: block;
-  margin-bottom: 10px;
-}
-#eventForm input, #eventForm textarea {
-  width: 100%;
-  box-sizing: border-box;
-  margin-top: 2px;
-  margin-bottom: 8px;
-}
-#eventForm button {
-  width: 100%;
-  padding: 8px;
-  background: #1976d2;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-}
-#eventForm button:hover {
-  background: #1565c0;
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.85);
 }
 
-#clearAllBtnContainer {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 2000;
-  width: 44px;
-  height: 44px;
+.modal-content {
+    background-color: #121212;
+    margin: 10% auto;
+    padding: 24px;
+    border: 1px solid #333;
+    width: 400px;
+    max-width: 90%;
+    border-radius: 8px;
+    position: relative;
+    color: #ffffff;
 }
-#clearAllBtn {
-  display: none;
-  width: 110px;
-  height: 32px;
-  font-size: 13px;
-  padding: 0 10px;
-  background: #d32f2f;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  opacity: 0;
-  transition: opacity 0.2s;
-  position: absolute;
-  bottom: 0;
-  right: 0;
+
+.close {
+    color: #999;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    right: 16px;
+    top: 12px;
 }
-#clearAllBtnContainer:hover #clearAllBtn {
-  display: block;
-  opacity: 1;
+
+.close:hover,
+.close:focus {
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Form styles */
+#eventForm label, #passwordForm label {
+    display: block;
+    margin-bottom: 8px;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+#eventForm input, 
+#eventForm textarea,
+#passwordForm input {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    border: 1px solid #333;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+#eventForm input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
+}
+
+#eventForm input:focus, 
+#eventForm textarea:focus,
+#passwordForm input:focus {
+    outline: none;
+    border-color: #2962ff;
+}
+
+#eventForm button,
+#passwordForm button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    background: #2962ff;
+    color: #fff;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+#eventForm button:hover,
+#passwordForm button:hover {
+    background: #2051db;
+}
+
+#eventDeleteBtn {
+    background: #d32f2f !important;
+}
+
+#eventDeleteBtn:hover {
+    background: #b71c1c !important;
+}
+
+#passwordCancelBtn {
+    background: #333 !important;
+}
+
+#passwordCancelBtn:hover {
+    background: #444 !important;
+}
+
+/* Light mode styles */
+body.light-mode {
+    background-color: #f5f5f5;
+    color: #333333;
+}
+
+body.light-mode #calendar {
+    background: #ffffff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+}
+
+body.light-mode #profileSelect,
+body.light-mode #subprofileSelect {
+    background: #ffffff !important;
+    color: #333333 !important;
+    border: 1px solid #ddd !important;
+}
+
+body.light-mode #showAllSubprofilesBtn,
+body.light-mode #logoutBtn,
+body.light-mode #createProfileBtn,
+body.light-mode #createSubprofileBtn,
+body.light-mode #exportIcalBtn,
+body.light-mode #importIcalBtn,
+body.light-mode #printCalendarBtn {
+    background: #1976d2 !important;
+    color: #ffffff !important;
+}
+
+body.light-mode #showAllSubprofilesBtn:hover,
+body.light-mode #logoutBtn:hover,
+body.light-mode #createProfileBtn:hover,
+body.light-mode #createSubprofileBtn:hover,
+body.light-mode #exportIcalBtn:hover,
+body.light-mode #importIcalBtn:hover,
+body.light-mode #printCalendarBtn:hover {
+    background: #1565c0 !important;
+}
+
+body.light-mode .fc {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+}
+
+body.light-mode .fc-toolbar {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+}
+
+body.light-mode .fc-button {
+    background-color: #1976d2 !important;
+    border-color: #1976d2 !important;
+    color: #ffffff !important;
+}
+
+body.light-mode .fc-button:hover {
+    background-color: #1565c0 !important;
+    border-color: #1565c0 !important;
+}
+
+body.light-mode .fc-button-active {
+    background-color: #0d47a1 !important;
+    border-color: #0d47a1 !important;
+}
+
+body.light-mode .fc-daygrid-day {
+    background-color: #ffffff !important;
+    border-color: #ddd !important;
+}
+
+body.light-mode .fc-daygrid-day-frame {
+    background-color: #ffffff !important;
+}
+
+body.light-mode .fc-day-today {
+    background-color: #f8f9fa !important;
+}
+
+body.light-mode .fc-daygrid-day-number {
+    color: #333333 !important;
+}
+
+body.light-mode .fc-col-header-cell {
+    background-color: #f8f9fa !important;
+    color: #333333 !important;
+    border-color: #ddd !important;
+}
+
+body.light-mode .fc-col-header-cell-cushion {
+    color: #333333 !important;
+}
+
+body.light-mode .modal-content {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    color: #333333;
+}
+
+body.light-mode #eventForm label,
+body.light-mode #passwordForm label {
+    color: #333333;
+}
+
+body.light-mode #eventForm input,
+body.light-mode #eventForm textarea,
+body.light-mode #passwordForm input {
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #ddd;
+}
+
+body.light-mode #eventForm input:focus,
+body.light-mode #eventForm textarea:focus,
+body.light-mode #passwordForm input:focus {
+    border-color: #1976d2;
+}
+
+body.light-mode #eventForm button,
+body.light-mode #passwordForm button {
+    background: #1976d2;
+}
+
+body.light-mode #eventForm button:hover,
+body.light-mode #passwordForm button:hover {
+    background: #1565c0;
 }
 
 /* Print styles */
 @media print {
-  /* Hide all UI elements except the calendar */
-  #profileBar, #profileActions, #exportIcalBtn, #printCalendarBtn, #importIcalBtn, #clearAllBtnContainer {
-    display: none !important;
-  }
-  
-  /* Remove shadows and borders for cleaner print */
-  #calendar {
-    box-shadow: none !important;
-    border: 1px solid #ccc !important;
-  }
-  
-  /* Ensure events don't break across pages */
-  .fc-event {
-    page-break-inside: avoid !important;
-  }
-  
-  /* Ensure month views don't break awkwardly */
-  .fc-month-view {
-    page-break-after: auto !important;
-  }
-  
-  /* Optimize text for printing */
-  .fc-event-title {
-    font-size: 12px !important;
-  }
-  
-  /* Remove background colors that don't print well */
-  .fc-daygrid-day {
-    background: white !important;
-  }
-  
-  /* Ensure proper spacing */
-  .fc-daygrid-day-frame {
-    min-height: 80px !important;
-  }
-  
-  /* Hide today indicator for print */
-  .fc-day-today {
-    background: #f8f9fa !important;
-  }
-  
-  /* Ensure calendar takes full width */
-  #calendar {
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 10px !important;
-  }
-  
-  /* Hide FullCalendar toolbar for print */
-  .fc-toolbar {
-    display: none !important;
-  }
-  
-  /* Add header for print */
-  #calendar::before {
-    content: "Calendar - " attr(data-current-view) " - " attr(data-current-date);
-    display: block;
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 20px;
-    padding: 10px;
-    border-bottom: 2px solid #333;
-  }
+    .header-section {
+        display: none !important;
+    }
+    
+    #calendar {
+        background: white !important;
+    }
+}
+
+/* Week number styles for dark mode */
+.fc-daygrid-week-number {
+    color: #ffffff !important;
+    opacity: 0.9 !important;
+    font-weight: 500 !important;
+    background-color: #333 !important;
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+}
+
+/* Light mode styles */
+body.light-mode .fc-daygrid-week-number {
+    color: #333333 !important;
+    background-color: #f0f0f0 !important;
+    opacity: 1 !important;
+}
+
+/* Ensure day cells expand to fill space */
+.fc .fc-daygrid-body {
+    height: 100% !important;
+}
+
+.fc .fc-daygrid-body table {
+    height: 100% !important;
+}
+
+/* Ensure day cells expand to fill space */
+.fc .fc-daygrid-day-frame {
+    height: 100% !important;
+    min-height: unset !important;
 }

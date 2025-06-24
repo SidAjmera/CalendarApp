@@ -8,26 +8,63 @@
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="header.css">
 </head>
 <body>
-  <div id="profileBar" style="margin: 16px 0 8px 16px; display: flex; align-items: center; gap: 8px;">
-    <select id="profileSelect" style="padding: 7px; border-radius: 4px; border: 1px solid #ccc; font-size: 15px;"></select>
-    <select id="subprofileSelect" style="padding: 7px; border-radius: 4px; border: 1px solid #ccc; font-size: 15px;"></select>
-    <button id="showAllSubprofilesBtn" style="display:none; padding: 7px 14px; background: #ff9800; color: #fff; border: none; border-radius: 4px; font-size: 15px; cursor: pointer;">Show All Calendars</button>
-    <button id="logoutBtn" style="display:none; padding: 7px 14px; background: #757575; color: #fff; border: none; border-radius: 4px; font-size: 15px; cursor: pointer;">Log Out</button>
+  <div class="header-section">
+    <div class="header-main">
+      <div class="profile-controls">
+        <select id="profileSelect" class="header-select">
+          <option value="">Select Profile...</option>
+        </select>
+        <select id="subprofileSelect" class="header-select">
+          <option value="">Select Calendar...</option>
+        </select>
+        <button id="showAllSubprofilesBtn" class="header-btn" style="display:none">
+          <span>📅</span> Show All Calendars
+        </button>
+        <button id="logoutBtn" class="header-btn" style="display:none">
+          <span>🚪</span> Log Out
+        </button>
+      </div>
+      <button id="themeToggleBtn" class="header-btn">🌙 Dark</button>
+    </div>
+    
+    <div class="header-actions">
+      <div class="button-group">
+        <button id="createProfileBtn" class="header-btn btn-primary">
+          <span>➕</span> New Profile
+        </button>
+        <button id="deleteProfileBtn" class="header-btn btn-danger">
+          <span>🗑️</span> Delete Profile
+        </button>
+      </div>
+      
+      <div class="button-group">
+        <button id="createSubprofileBtn" class="header-btn btn-primary">
+          <span>➕</span> New Calendar
+        </button>
+        <button id="deleteSubprofileBtn" class="header-btn btn-danger">
+          <span>🗑️</span> Delete Calendar
+        </button>
+      </div>
+      
+      <div class="button-group">
+        <button id="exportIcalBtn" class="header-btn">
+          <span>📤</span> Export
+        </button>
+        <label style="display:inline-block;">
+          <input type="file" id="importIcalFile" accept=".ics" style="display:none;">
+          <button type="button" id="importIcalBtn" class="header-btn">
+            <span>📥</span> Import
+          </button>
+        </label>
+        <button id="printCalendarBtn" class="header-btn">
+          <span>🖨️</span> Print
+        </button>
+      </div>
+    </div>
   </div>
-  <div id="profileActions" style="margin: 0 0 8px 16px;">
-    <button id="createProfileBtn" style="padding: 6px 12px; background: #1976d2; color: #fff; border: none; border-radius: 4px; font-size: 14px; cursor: pointer;">+ Create New Profile</button>
-    <button id="deleteProfileBtn" style="padding: 6px 12px; background: #d32f2f; color: #fff; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; margin-left: 8px;">- Delete Profile</button>
-    <button id="createSubprofileBtn" style="padding: 6px 12px; background: #388e3c; color: #fff; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; margin-left: 8px;">+ Create New Calendar</button>
-    <button id="deleteSubprofileBtn" style="padding: 6px 12px; background: #d32f2f; color: #fff; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; margin-left: 8px;">- Delete Calendar</button>
-  </div>
-  <button id="exportIcalBtn" style="margin: 0 0 8px 16px; padding: 8px 16px; background: #1976d2; color: #fff; border: none; border-radius: 4px; font-size: 15px; cursor: pointer;">Export to iCal</button>
-  <button id="printCalendarBtn" style="margin: 0 0 8px 8px; padding: 8px 16px; background: #ff9800; color: #fff; border: none; border-radius: 4px; font-size: 15px; cursor: pointer;">Print Calendar</button>
-  <label style="margin-left:16px;display:inline-block;">
-    <input type="file" id="importIcalFile" accept=".ics" style="display:none;">
-    <button type="button" id="importIcalBtn" style="padding: 8px 16px; background: #388e3c; color: #fff; border: none; border-radius: 4px; font-size: 15px; cursor: pointer;">Import iCal File</button>
-  </label>
   <div id="calendar"></div>
 
     <!-- FullCalendar JS -->
@@ -38,38 +75,46 @@
     <script src="script.js"></script>
 
     <!-- Add this just before </body> -->
-    <div id="eventModal" class="modal" style="display:none;">
+    <div id="eventModal" class="modal">
       <div class="modal-content">
-        <span id="closeModal" class="close">&times;</span>
+        <span class="close" id="closeModal">&times;</span>
         <h2>Create New Event</h2>
         <form id="eventForm">
-          <label>Title: <input type="text" id="eventTitle" required></label><br>
-          <label>Date: <input type="date" id="eventDate" required></label><br>
-          <label><input type="checkbox" id="eventAllDay" checked> All Day</label><br>
-          <label>Time: <input type="time" id="eventTime"></label><br>
-          <label>Location: <input type="text" id="eventLocation"></label><br>
-          <label>Color: <input type="color" id="eventColor" value="#1976d2"></label><br>
-          <label>Description: <textarea id="eventDescription"></textarea></label><br>
-          <button type="submit" id="eventSaveBtn">Save</button>
+          <label for="eventTitle">Title:</label>
+          <input type="text" id="eventTitle" required>
+          
+          <label for="eventDate">Date:</label>
+          <input type="date" id="eventDate" required>
+          
+          <label for="eventAllDay">All Day:</label>
+          <input type="checkbox" id="eventAllDay" checked>
+          
+          <label for="eventTime">Time:</label>
+          <input type="time" id="eventTime" disabled>
+          
+          <label for="eventLocation">Location:</label>
+          <input type="text" id="eventLocation">
+          
+          <label for="eventDescription">Description:</label>
+          <textarea id="eventDescription"></textarea>
+          
+          <label for="eventColor">Color:</label>
+          <input type="color" id="eventColor" value="#1976d2">
+          
+          <button type="submit" id="eventSaveBtn">Save Event</button>
           <button type="button" id="eventDeleteBtn" style="display:none; background:#d32f2f; color:#fff; margin-top:8px;">Delete</button>
         </form>
       </div>
     </div>
-    <!-- Clear All Data Button Container -->
-    <div id="clearAllBtnContainer" style="position:fixed;bottom:24px;right:24px;z-index:2000;">
-      <button id="clearAllBtn">Clear All Data</button>
-    </div>
-    <div id="passwordModal" class="modal" style="display:none;">
+    <div id="passwordModal" class="modal">
       <div class="modal-content">
-        <span id="closePasswordModal" class="close">&times;</span>
-        <h2 id="passwordModalTitle">Enter Password</h2>
+        <span class="close" id="closePasswordModal">&times;</span>
+        <h3 id="passwordModalTitle">Enter Password</h3>
         <form id="passwordForm">
-          <label id="passwordModalLabel" for="passwordInput">Password:</label>
-          <input type="password" id="passwordInput" style="width:100%;margin-bottom:12px;" required>
-          <div style="display:flex;gap:8px;">
-            <button type="submit" id="passwordOkBtn" style="flex:1;">OK</button>
-            <button type="button" id="passwordCancelBtn" style="flex:1;">Cancel</button>
-          </div>
+          <label id="passwordModalLabel">Password:</label>
+          <input type="password" id="passwordInput" required>
+          <button type="submit" id="passwordOkBtn">OK</button>
+          <button type="button" id="passwordCancelBtn">Cancel</button>
         </form>
       </div>
     </div>
