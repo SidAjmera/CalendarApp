@@ -419,3 +419,13 @@ body.light-mode .fc-daygrid-week-number {
     height: 100% !important;
     min-height: unset !important;
 }
+
+.search-bar-absolute {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    min-width: 220px;
+    text-align: right;
+    z-index: 4000;
+}

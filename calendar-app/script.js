@@ -139,7 +139,11 @@ document.addEventListener('DOMContentLoaded', function() {
              endTime: '17:00',
          },
          dateClick: function(info) {
-            openEventModal(info.dateStr);
+            if (currentProfile && currentSubprofile) {
+                openEventModal(info.dateStr);
+            } else {
+                alert('Please sign in to a profile and select a calendar to create events.');
+            }
          },
      });
  
@@ -167,13 +171,20 @@ document.addEventListener('DOMContentLoaded', function() {
      const eventAllDayInput = document.getElementById('eventAllDay');
      const eventSaveBtn = document.getElementById('eventSaveBtn');
      const eventDeleteBtn = document.getElementById('eventDeleteBtn');
+     const eventRepeatInput = document.getElementById('eventRepeat');
+     const customRepeatSection = document.getElementById('customRepeatSection');
+     const customRepeatInterval = document.getElementById('customRepeatInterval');
+     const customRepeatType = document.getElementById('customRepeatType');
+     const customRepeatEnd = document.getElementById('customRepeatEnd');
 
      let editingEvent = null; // Will hold the event being edited, if any
 
      function openEventModal(dateStr, event = null) {
         eventModal.style.display = 'block';
+        const modalTitle = eventModal.querySelector('h2');
         if (event) {
             // Editing existing event
+            if (modalTitle) modalTitle.textContent = 'Edit Event';
             eventTitleInput.value = event.title || '';
             eventDateInput.value = event.start ? event.start.split('T')[0] : dateStr;
             eventAllDayInput.checked = event.allDay;
@@ -182,10 +193,13 @@ document.addEventListener('DOMContentLoaded', function() {
             eventLocationInput.value = event.location || '';
             eventDescriptionInput.value = event.description || '';
             eventColorInput.value = event.backgroundColor || '#1976d2';
+            eventRepeatInput.value = event.recurrence ? event.recurrence.type : 'none';
+            customRepeatSection.style.display = event.recurrence ? '' : 'none';
             eventDeleteBtn.style.display = 'inline-block';
             editingEvent = event;
         } else {
             // Creating new event
+            if (modalTitle) modalTitle.textContent = 'Create New Event';
             eventTitleInput.value = '';
             eventDateInput.value = dateStr;
             eventAllDayInput.checked = true;
@@ -194,6 +208,8 @@ document.addEventListener('DOMContentLoaded', function() {
             eventLocationInput.value = '';
             eventDescriptionInput.value = '';
             eventColorInput.value = '#1976d2';
+            eventRepeatInput.value = 'none';
+            customRepeatSection.style.display = 'none';
             eventDeleteBtn.style.display = 'none';
             editingEvent = null;
         }
@@ -213,6 +229,15 @@ document.addEventListener('DOMContentLoaded', function() {
         eventTimeInput.disabled = eventAllDayInput.checked;
      });
 
+     // Show/hide custom repeat section
+     eventRepeatInput.addEventListener('change', function() {
+        if (eventRepeatInput.value === 'custom') {
+            customRepeatSection.style.display = '';
+        } else {
+            customRepeatSection.style.display = 'none';
+        }
+     });
+
      // Save (create or update) event to localStorage
      eventForm.onsubmit = function(e) {
         e.preventDefault();
@@ -229,6 +254,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const allDay = eventAllDayInput.checked;
         let start = date;
         if (!allDay && time) start += 'T' + time;
+        // Recurrence info
+        let recurrence = null;
+        if (eventRepeatInput.value !== 'none') {
+          if (eventRepeatInput.value === 'custom') {
+            recurrence = {
+              type: customRepeatType.value,
+              interval: parseInt(customRepeatInterval.value, 10) || 1,
+              end: customRepeatEnd.value || null
+            };
+          } else {
+            recurrence = {
+              type: eventRepeatInput.value,
+              interval: 1,
+              end: null
+            };
+          }
+        }
         let events = currentProfile && currentSubprofile ? 
           (() => {
             const profiles = getProfiles();
@@ -250,7 +292,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     backgroundColor: color,
                     borderColor: color,
                     textColor: '#fff',
-                    id: editingEvent.id
+                    id: editingEvent.id,
+                    recurrence
                 };
             }
             if (currentProfile && currentSubprofile) {
@@ -258,18 +301,10 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 localStorage.setItem('calendarEvents', JSON.stringify(events));
             }
-            // Update in calendar using Event API
+            // Remove and re-add event to calendar
             const calEvent = calendar.getEventById(editingEvent.id);
-            if (calEvent) {
-                calEvent.setProp('title', title);
-                calEvent.setStart(start);
-                calEvent.setAllDay(allDay);
-                calEvent.setExtendedProp('location', location);
-                calEvent.setExtendedProp('description', description);
-                calEvent.setProp('backgroundColor', color);
-                calEvent.setProp('borderColor', color);
-                calEvent.setProp('textColor', '#fff');
-            }
+            if (calEvent) calEvent.remove();
+            calendar.addEvent(events[idx]);
         } else {
             // Create new event
             let eventObj = {
@@ -281,7 +316,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 description,
                 backgroundColor: color,
                 borderColor: color,
-                textColor: '#fff'
+                textColor: '#fff',
+                recurrence
             };
             events.push(eventObj);
             if (currentProfile && currentSubprofile) {
@@ -305,29 +341,181 @@ document.addEventListener('DOMContentLoaded', function() {
                 return prof && prof.events && prof.events[currentSubprofile] ? prof.events[currentSubprofile] : [];
               })() : 
               JSON.parse(localStorage.getItem('calendarEvents') || '[]');
-            events = events.filter(ev => ev.id !== editingEvent.id);
-            if (currentProfile && currentSubprofile) {
-                saveEventsForCurrent(events);
+            // Always use the base ID (strip _recur_...)
+            const baseId = editingEvent.id.split('_recur_')[0];
+            const eventIdx = events.findIndex(ev => ev.id === baseId);
+            if (eventIdx === -1) return;
+            const eventObj = events[eventIdx];
+            if (eventObj.recurrence) {
+                // Recurring event: ask user
+                const choice = window.prompt('This is a recurring event. Type "one" to delete only this occurrence, or "all" to delete the entire series.', 'one');
+                if (choice === 'one') {
+                    // Add exception for this occurrence
+                    if (!eventObj.exceptions) eventObj.exceptions = [];
+                    // Use the date/time of the occurrence being edited
+                    let occurrenceDate = editingEvent.start;
+                    if (editingEvent.allDay) {
+                        occurrenceDate = occurrenceDate.slice(0, 10);
+                    }
+                    eventObj.exceptions.push(occurrenceDate);
+                    events[eventIdx] = eventObj;
+                    if (currentProfile && currentSubprofile) {
+                        saveEventsForCurrent(events);
+                    } else {
+                        localStorage.setItem('calendarEvents', JSON.stringify(events));
+                    }
+                    clearCalendarEvents();
+                    loadEventsForCurrent();
+                    eventModal.style.display = 'none';
+                    editingEvent = null;
+                    return;
+                } else if (choice === 'all') {
+                    // Remove the whole series
+                    events = events.filter(ev => ev.id !== baseId);
+                    if (currentProfile && currentSubprofile) {
+                        saveEventsForCurrent(events);
+                    } else {
+                        localStorage.setItem('calendarEvents', JSON.stringify(events));
+                    }
+                    clearCalendarEvents();
+                    loadEventsForCurrent();
+                    eventModal.style.display = 'none';
+                    editingEvent = null;
+                    return;
+                } else {
+                    // Cancel
+                    return;
+                }
             } else {
-                localStorage.setItem('calendarEvents', JSON.stringify(events));
+                // Not recurring: delete as before
+                events = events.filter(ev => ev.id !== baseId);
+                if (currentProfile && currentSubprofile) {
+                    saveEventsForCurrent(events);
+                } else {
+                    localStorage.setItem('calendarEvents', JSON.stringify(events));
+                }
+                const calEvent = calendar.getEventById(editingEvent.id);
+                if (calEvent) calEvent.remove();
+                eventModal.style.display = 'none';
+                editingEvent = null;
             }
-            const calEvent = calendar.getEventById(editingEvent.id);
-            if (calEvent) calEvent.remove();
-            eventModal.style.display = 'none';
-            editingEvent = null;
         }
      };
 
-     // Load events from localStorage
+     // Helper to expand recurring events
+     function expandRecurringEvent(event, rangeStart, rangeEnd) {
+       if (!event.recurrence) return [event];
+       const occurrences = [];
+       const startDate = new Date(event.start);
+       let current = new Date(startDate);
+       let count = 0;
+       const maxCount = 500; // safety limit
+       const interval = event.recurrence.interval || 1;
+       const type = event.recurrence.type;
+       const endRepeat = event.recurrence.end ? new Date(event.recurrence.end) : null;
+       const exceptions = event.exceptions || [];
+       while (count < maxCount) {
+         if (current > rangeEnd) break;
+         let occurrenceDate = event.allDay
+           ? current.toISOString().slice(0, 10)
+           : current.toISOString();
+         if (current >= rangeStart && !exceptions.includes(occurrenceDate)) {
+           occurrences.push({
+             ...event,
+             start: occurrenceDate,
+             id: event.id + '_recur_' + count
+           });
+         }
+         // Next occurrence
+         switch (type) {
+           case 'daily':
+           case 'days':
+             current.setDate(current.getDate() + interval); break;
+           case 'weekly':
+           case 'weeks':
+             current.setDate(current.getDate() + 7 * interval); break;
+           case 'monthly':
+           case 'months':
+             current.setMonth(current.getMonth() + interval); break;
+           case 'yearly':
+           case 'years':
+             current.setFullYear(current.getFullYear() + interval); break;
+           case 'hourly':
+           case 'hours':
+             current.setHours(current.getHours() + interval); break;
+           default:
+             return occurrences;
+         }
+         if (endRepeat && current > endRepeat) break;
+         count++;
+       }
+       return occurrences;
+     }
+
+     // Patch event loading functions to use recurrence expansion
+     function getCalendarViewRange() {
+       // Try to get current calendar view range, fallback to +/- 1 year
+       if (calendar && calendar.view) {
+         return {
+           start: calendar.view.activeStart,
+           end: calendar.view.activeEnd
+         };
+       }
+       const now = new Date();
+       return {
+         start: new Date(now.getFullYear() - 1, 0, 1),
+         end: new Date(now.getFullYear() + 1, 11, 31)
+       };
+     }
+
+     function loadEventsForCurrent() {
+       clearCalendarEvents();
+       if (!currentProfile || !currentSubprofile) return;
+       const profiles = getProfiles();
+       const prof = profiles.find(p => p.name === currentProfile);
+       if (!prof) return;
+       const events = (prof.events && prof.events[currentSubprofile]) || [];
+       const { start, end } = getCalendarViewRange();
+       events.forEach(event => {
+         expandRecurringEvent(event, start, end).forEach(ev => calendar.addEvent(ev));
+       });
+     }
+
+     function loadAllCalendarEvents() {
+       clearCalendarEvents();
+       if (!currentProfile) return;
+       const profiles = getProfiles();
+       const prof = profiles.find(p => p.name === currentProfile);
+       if (!prof || !prof.subprofiles || prof.subprofiles.length === 0) return;
+       const colors = ['#1976d2', '#388e3c', '#f57c00', '#7b1fa2', '#d32f2f', '#1976d2', '#388e3c', '#f57c00'];
+       const { start, end } = getCalendarViewRange();
+       prof.subprofiles.forEach((subprofile, index) => {
+         const events = (prof.events && prof.events[subprofile]) || [];
+         const color = colors[index % colors.length];
+         events.forEach(event => {
+           expandRecurringEvent(event, start, end).forEach(ev => {
+             calendar.addEvent({
+               ...ev,
+               title: `[${subprofile}] ${ev.title}`,
+               backgroundColor: color,
+               borderColor: color,
+               textColor: '#fff'
+             });
+           });
+         });
+       });
+     }
+
      function loadEventsFromLocalStorage() {
-        if (currentProfile && currentSubprofile) {
-            loadEventsForCurrent();
-        } else {
-            let events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
-            events.forEach(event => {
-                calendar.addEvent(event);
-            });
-        }
+       if (currentProfile && currentSubprofile) {
+         loadEventsForCurrent();
+       } else {
+         let events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+         const { start, end } = getCalendarViewRange();
+         events.forEach(event => {
+           expandRecurringEvent(event, start, end).forEach(ev => calendar.addEvent(ev));
+         });
+       }
      }
 
      // Event click handler for editing
@@ -343,7 +531,8 @@ document.addEventListener('DOMContentLoaded', function() {
             description: info.event.extendedProps.description,
             backgroundColor: info.event.backgroundColor,
             borderColor: info.event.borderColor,
-            textColor: info.event.textColor
+            textColor: info.event.textColor,
+            recurrence: info.event.extendedProps.recurrence
         };
         openEventModal(eventObj.start.split('T')[0], eventObj);
      });
@@ -510,39 +699,6 @@ document.addEventListener('DOMContentLoaded', function() {
      }
      function clearCalendarEvents() {
        calendar.getEvents().forEach(ev => ev.remove());
-     }
-     function loadEventsForCurrent() {
-       clearCalendarEvents();
-       if (!currentProfile || !currentSubprofile) return;
-       const profiles = getProfiles();
-       const prof = profiles.find(p => p.name === currentProfile);
-       if (!prof) return;
-       const events = (prof.events && prof.events[currentSubprofile]) || [];
-       events.forEach(event => calendar.addEvent(event));
-     }
-     function loadAllCalendarEvents() {
-       clearCalendarEvents();
-       if (!currentProfile) return;
-       const profiles = getProfiles();
-       const prof = profiles.find(p => p.name === currentProfile);
-       if (!prof || !prof.subprofiles || prof.subprofiles.length === 0) return;
-       
-       // Define colors for different calendars
-       const colors = ['#1976d2', '#388e3c', '#f57c00', '#7b1fa2', '#d32f2f', '#1976d2', '#388e3c', '#f57c00'];
-       
-       prof.subprofiles.forEach((subprofile, index) => {
-         const events = (prof.events && prof.events[subprofile]) || [];
-         const color = colors[index % colors.length];
-         events.forEach(event => {
-           calendar.addEvent({
-             ...event,
-             title: `[${subprofile}] ${event.title}`,
-             backgroundColor: color,
-             borderColor: color,
-             textColor: '#fff'
-           });
-         });
-       });
      }
      function saveEventsForCurrent(events) {
        const profiles = getProfiles();
@@ -948,9 +1104,6 @@ document.addEventListener('DOMContentLoaded', function() {
      };
 
      // Event listeners
-     loadProfiles();
-     updateProfileSelect();
-     updateSubprofileSelect();
      
      // Initialize calendar and load events
      calendar.render();
@@ -959,4 +1112,111 @@ document.addEventListener('DOMContentLoaded', function() {
      // Update calendar options for better viewport usage
      calendar.setOption('height', '100%');
      calendar.setOption('expandRows', true);
+
+     // --- Fuzzy Search Logic ---
+     const eventSearchInput = document.getElementById('eventSearchInput');
+     const searchResultsDiv = document.getElementById('searchResults');
+     let allOccurrences = [];
+     let fuse = null;
+
+     function updateAllOccurrences() {
+       // Gather all visible event occurrences (for current profile/calendar)
+       allOccurrences = [];
+       const { start, end } = getCalendarViewRange();
+       let events = [];
+       if (currentProfile && currentSubprofile) {
+         const profiles = getProfiles();
+         const prof = profiles.find(p => p.name === currentProfile);
+         if (prof && prof.events && prof.events[currentSubprofile]) {
+           events = prof.events[currentSubprofile];
+         }
+       } else {
+         events = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
+       }
+       events.forEach(event => {
+         expandRecurringEvent(event, start, end).forEach(ev => allOccurrences.push(ev));
+       });
+       // Rebuild Fuse index
+       fuse = new Fuse(allOccurrences, {
+         keys: ['title', 'description', 'location'],
+         threshold: 0.4,
+         includeScore: true
+       });
+       console.log('Fuse index built. Occurrences:', allOccurrences.length);
+     }
+
+     // Build search index on page load
+     updateAllOccurrences();
+
+     function renderSearchResults(results) {
+       if (!results.length) {
+         searchResultsDiv.style.display = 'none';
+         searchResultsDiv.innerHTML = '';
+         return;
+       }
+       searchResultsDiv.innerHTML = results.map(r => {
+         const ev = r.item;
+         const dateStr = ev.start ? (ev.allDay ? ev.start : new Date(ev.start).toLocaleString()) : '';
+         return `<div class="search-result-item" style="padding:8px; border-bottom:1px solid #eee; cursor:pointer;" data-id="${ev.id}" data-date="${ev.start}">
+           <strong>${ev.title}</strong><br>
+           <span style='font-size:12px;'>${dateStr}</span><br>
+           <span style='font-size:12px;'>${ev.location || ''}</span>
+         </div>`;
+       }).join('');
+       searchResultsDiv.style.display = 'block';
+     }
+
+     eventSearchInput.addEventListener('input', function() {
+       console.log('Input event fired:', eventSearchInput.value);
+       const query = eventSearchInput.value.trim();
+       if (!query) {
+         searchResultsDiv.style.display = 'none';
+         searchResultsDiv.innerHTML = '';
+         return;
+       }
+       if (!fuse) updateAllOccurrences();
+       const results = fuse.search(query).slice(0, 10); // limit to 10 results
+       console.log('Search results:', results);
+       renderSearchResults(results);
+     });
+
+     document.addEventListener('click', function(e) {
+       if (!searchResultsDiv.contains(e.target) && e.target !== eventSearchInput) {
+         searchResultsDiv.style.display = 'none';
+       }
+     });
+
+     searchResultsDiv.addEventListener('click', function(e) {
+       let target = e.target;
+       while (target && !target.classList.contains('search-result-item')) {
+         target = target.parentElement;
+       }
+       if (target) {
+         const id = target.getAttribute('data-id');
+         const date = target.getAttribute('data-date');
+         // Find the event occurrence
+         const ev = allOccurrences.find(ev => ev.id === id && ev.start === date);
+         if (ev) {
+           openEventModal(ev.start.split('T')[0], ev);
+           searchResultsDiv.style.display = 'none';
+         }
+       }
+     });
+
+     // Update search index whenever events are loaded
+     const origLoadEventsForCurrent = loadEventsForCurrent;
+     loadEventsForCurrent = function() {
+       origLoadEventsForCurrent.apply(this, arguments);
+       updateAllOccurrences();
+     };
+     const origLoadEventsFromLocalStorage = loadEventsFromLocalStorage;
+     loadEventsFromLocalStorage = function() {
+       origLoadEventsFromLocalStorage.apply(this, arguments);
+       updateAllOccurrences();
+     };
+     const origLoadAllCalendarEvents = loadAllCalendarEvents;
+     loadAllCalendarEvents = function() {
+       origLoadAllCalendarEvents.apply(this, arguments);
+       updateAllOccurrences();
+     };
 });

@@ -30,7 +30,7 @@
       <button id="themeToggleBtn" class="header-btn">🌙 Dark</button>
     </div>
     
-    <div class="header-actions">
+    <div class="header-actions" style="position: relative;">
       <div class="button-group">
         <button id="createProfileBtn" class="header-btn btn-primary">
           <span>➕</span> New Profile
@@ -39,7 +39,6 @@
           <span>🗑️</span> Delete Profile
         </button>
       </div>
-      
       <div class="button-group">
         <button id="createSubprofileBtn" class="header-btn btn-primary">
           <span>➕</span> New Calendar
@@ -48,7 +47,6 @@
           <span>🗑️</span> Delete Calendar
         </button>
       </div>
-      
       <div class="button-group">
         <button id="exportIcalBtn" class="header-btn">
           <span>📤</span> Export
@@ -63,6 +61,10 @@
           <span>🖨️</span> Print
         </button>
       </div>
+      <div id="searchBarContainer" class="search-bar-absolute">
+        <input id="eventSearchInput" type="text" placeholder="Search events..." style="width: 220px; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px;">
+        <div id="searchResults" style="background: #fff; color: #333; border: 1px solid #ccc; border-radius: 6px; margin-top: 2px; display: none; position: absolute; right: 0; width: 100%; z-index: 3000;"></div>
+      </div>
     </div>
   </div>
   <div id="calendar"></div>
@@ -71,6 +73,8 @@
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
      <!-- FullCalendar Plugins -->
      <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@5.11.3/main.min.js'></script>
+    <!-- Fuse.js for fuzzy search -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
     <!-- Custom JS -->
     <script src="script.js"></script>
 
@@ -100,6 +104,32 @@
           
           <label for="eventColor">Color:</label>
           <input type="color" id="eventColor" value="#1976d2">
+
+          <label for="eventRepeat">Repeat:</label>
+          <select id="eventRepeat">
+            <option value="none">None</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+            <option value="hourly">Hourly</option>
+            <option value="custom">Custom...</option>
+          </select>
+
+          <div id="customRepeatSection" style="display:none; margin-top:8px;">
+            <label for="customRepeatType">Repeat every:</label>
+            <input type="number" id="customRepeatInterval" min="1" value="1" style="width:60px; display:inline-block;"> 
+            <select id="customRepeatType" style="width:auto; display:inline-block;">
+              <option value="days">Days</option>
+              <option value="weeks">Weeks</option>
+              <option value="months">Months</option>
+              <option value="years">Years</option>
+              <option value="hours">Hours</option>
+            </select>
+            <br>
+            <label for="customRepeatEnd">End repeat:</label>
+            <input type="date" id="customRepeatEnd">
+          </div>
           
           <button type="submit" id="eventSaveBtn">Save Event</button>
           <button type="button" id="eventDeleteBtn" style="display:none; background:#d32f2f; color:#fff; margin-top:8px;">Delete</button>
