@@ -1,4 +1,4 @@
-/* Dark mode (default) */
+/* --- General Styles for Calendar App --- */
 body {
     background-color: #000000;
     color: #ffffff;
@@ -37,7 +37,7 @@ h1 {
     gap: 8px;
 }
 
-/* Calendar container */
+/* --- Calendar Container Styles --- */
 #calendar {
     background: #121212;
     padding: 16px 24px;
@@ -138,7 +138,7 @@ h1 {
     color: #ffffff !important;
 }
 
-/* Modal styles */
+/* --- Event Modal Styles --- */
 .modal {
     display: none;
     position: fixed;
@@ -377,7 +377,18 @@ body.light-mode #passwordForm button:hover {
     background: #1565c0;
 }
 
-/* Print styles */
+/* --- Search Bar Styles --- */
+.search-bar-absolute {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    min-width: 220px;
+    text-align: right;
+    z-index: 4000;
+}
+
+/* --- Print Styles --- */
 @media print {
     .header-section {
         display: none !important;
@@ -418,14 +429,4 @@ body.light-mode .fc-daygrid-week-number {
 .fc .fc-daygrid-day-frame {
     height: 100% !important;
     min-height: unset !important;
-}
-
-.search-bar-absolute {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    min-width: 220px;
-    text-align: right;
-    z-index: 4000;
 }

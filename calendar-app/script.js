@@ -105,6 +105,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
      const calendarEl = document.getElementById('calendar');
      
+     // --- Calendar Initialization and Configuration ---
+     // Create a new FullCalendar instance and configure its options
      const calendar = new FullCalendar.Calendar(calendarEl, {
          initialView: 'dayGridMonth',
          headerToolbar: {
@@ -146,7 +148,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
          },
      });
- 
+
+     // Function to add a new event to the calendar
      function addEvent(title, start, end, allDay = false, calendarColor, description) {
         calendar.addEvent({
             title: title,
@@ -158,7 +161,8 @@ document.addEventListener('DOMContentLoaded', function() {
         })
      }
 
-     // Modal logic
+     // --- Modal Logic for Event Creation/Editing ---
+     // Get references to modal elements and form fields
      const eventModal = document.getElementById('eventModal');
      const closeModalBtn = document.getElementById('closeModal');
      const eventForm = document.getElementById('eventForm');
@@ -179,6 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
      let editingEvent = null; // Will hold the event being edited, if any
 
+     // Function to open the event modal for creating or editing an event
      function openEventModal(dateStr, event = null) {
         eventModal.style.display = 'block';
         const modalTitle = eventModal.querySelector('h2');
@@ -215,6 +220,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
      }
 
+     // Close modal when close button or outside modal is clicked
      closeModalBtn.onclick = function() {
         eventModal.style.display = 'none';
      };
@@ -229,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
         eventTimeInput.disabled = eventAllDayInput.checked;
      });
 
-     // Show/hide custom repeat section
+     // Show/hide custom repeat section based on repeat selection
      eventRepeatInput.addEventListener('change', function() {
         if (eventRepeatInput.value === 'custom') {
             customRepeatSection.style.display = '';
@@ -238,6 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
      });
 
+     // --- Event Form Submission Logic ---
      // Save (create or update) event to localStorage
      eventForm.onsubmit = function(e) {
         e.preventDefault();
@@ -330,7 +337,8 @@ document.addEventListener('DOMContentLoaded', function() {
         eventModal.style.display = 'none';
      };
 
-     // Delete event
+     // --- Event Deletion Logic ---
+     // Delete event (single or recurring)
      eventDeleteBtn.onclick = function(e) {
         e.preventDefault(); // Prevent form submission if inside form
         if (editingEvent && editingEvent.id) {
@@ -402,7 +410,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
      };
 
-     // Helper to expand recurring events
+     // --- Recurring Event Expansion ---
+     // Helper to expand recurring events into individual occurrences
      function expandRecurringEvent(event, rangeStart, rangeEnd) {
        if (!event.recurrence) return [event];
        const occurrences = [];
@@ -452,22 +461,8 @@ document.addEventListener('DOMContentLoaded', function() {
        return occurrences;
      }
 
-     // Patch event loading functions to use recurrence expansion
-     function getCalendarViewRange() {
-       // Try to get current calendar view range, fallback to +/- 1 year
-       if (calendar && calendar.view) {
-         return {
-           start: calendar.view.activeStart,
-           end: calendar.view.activeEnd
-         };
-       }
-       const now = new Date();
-       return {
-         start: new Date(now.getFullYear() - 1, 0, 1),
-         end: new Date(now.getFullYear() + 1, 11, 31)
-       };
-     }
-
+     // --- Event Loading Functions ---
+     // Load events for the current profile and calendar
      function loadEventsForCurrent() {
        clearCalendarEvents();
        if (!currentProfile || !currentSubprofile) return;
@@ -481,6 +476,7 @@ document.addEventListener('DOMContentLoaded', function() {
        });
      }
 
+     // Load all events for all calendars in the current profile
      function loadAllCalendarEvents() {
        clearCalendarEvents();
        if (!currentProfile) return;
@@ -506,6 +502,7 @@ document.addEventListener('DOMContentLoaded', function() {
        });
      }
 
+     // Load events from localStorage if no profile is selected
      function loadEventsFromLocalStorage() {
        if (currentProfile && currentSubprofile) {
          loadEventsForCurrent();
@@ -539,7 +536,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
      calendar.render();
 
-     // --- iCal Import Logic ---
+     // --- iCal Import/Export Logic ---
+     // Parse iCal (.ics) data into event objects
      function parseICal(icsData) {
         // Simple iCal parser for VEVENTs
         const events = [];
@@ -578,7 +576,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return events;
      }
 
-     // Import iCal File
+     // Import iCal file and add events to calendar
      const importIcalBtn = document.getElementById('importIcalBtn');
      const importIcalFile = document.getElementById('importIcalFile');
      importIcalBtn.onclick = function() {
@@ -614,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function() {
         importIcalFile.value = '';
      };
 
-     // Export to iCal button logic
+     // Export current events to an iCal (.ics) file
      const exportIcalBtn = document.getElementById('exportIcalBtn');
      exportIcalBtn.onclick = function() {
         let events = currentProfile && currentSubprofile ? 
@@ -661,7 +659,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.removeChild(link);
      };
 
-     // --- Profile & Subprofile Management ---
+     // --- Profile & Subprofile (Calendar) Management ---
+     // Get, save, and update profiles and calendars in localStorage
      const profileSelect = document.getElementById('profileSelect');
      const subprofileSelect = document.getElementById('subprofileSelect');
      const createProfileBtn = document.getElementById('createProfileBtn');
@@ -708,7 +707,9 @@ document.addEventListener('DOMContentLoaded', function() {
        prof.events[currentSubprofile] = events;
        saveProfiles(profiles);
      }
+
      // --- Password Modal Logic ---
+     // Show modal for password input and handle callbacks
      function showPasswordModal(title, label, callback) {
        const modal = document.getElementById('passwordModal');
        const closeBtn = document.getElementById('closePasswordModal');
@@ -1102,16 +1103,6 @@ document.addEventListener('DOMContentLoaded', function() {
             window.print();
         }, 100);
      };
-
-     // Event listeners
-     
-     // Initialize calendar and load events
-     calendar.render();
-     loadEventsFromLocalStorage();
-
-     // Update calendar options for better viewport usage
-     calendar.setOption('height', '100%');
-     calendar.setOption('expandRows', true);
 
      // --- Fuzzy Search Logic ---
      const eventSearchInput = document.getElementById('eventSearchInput');

@@ -1,55 +1,64 @@
 # CalendarApp
 
-A feature-rich calendar web app with support for multiple profiles, recurring events, and fuzzy search.
+A modern, feature-rich calendar web app designed for personal organization, productivity, and privacy. No sign-up or server required—everything runs in your browser!
 
-## Features
+## What Can You Do With CalendarApp?
 
-- **Multiple Profiles & Calendars:**
-  - Create, delete, and manage multiple user profiles, each with their own password.
-  - Each profile can have multiple calendars (subprofiles).
+- **Create Multiple Profiles:**
+  - Set up different user profiles, each protected by a password.
+  - Each profile can have multiple separate calendars (e.g., Work, School, Family).
 
-- **Event Management:**
-  - Add, edit, and delete events.
-  - Support for all-day and timed events.
-  - Color-code events.
+- **Manage Events Easily:**
+  - Add, edit, and delete events with details like title, date, time, location, description, and color.
+  - Choose between all-day or timed events.
 
 - **Recurring Events:**
-  - Create events that repeat daily, weekly, monthly, yearly, hourly, or on a custom schedule.
-  - Delete a single occurrence or the entire series for recurring events.
+  - Set events to repeat daily, weekly, monthly, yearly, hourly, or on a custom schedule.
+  - Delete just one occurrence or the entire series for recurring events.
 
 - **Fuzzy Search:**
-  - Search for events by title, description, or location using typo-tolerant fuzzy search (powered by Fuse.js).
-  - Search bar is always available at the top right of the calendar.
+  - Instantly search your events by title, description, or location—even with typos—using the search bar at the top right.
 
-- **Import/Export:**
-  - Import and export events in iCal (.ics) format.
+- **Import & Export:**
+  - Import events from iCal (.ics) files.
+  - Export your events to iCal format for use in other calendar apps.
 
-- **Print:**
-  - Print the current calendar view with profile/calendar info.
+- **Print Your Calendar:**
+  - Print the current calendar view, including profile and calendar info, for a physical copy or PDF.
 
-- **Dark/Light Mode:**
-  - Toggle between dark and light themes.
+- **Dark & Light Mode:**
+  - Switch between beautiful dark and light themes with a single click.
 
-## Setup & Usage
+- **Privacy First:**
+  - All your data is stored locally in your browser. No accounts, no cloud, no tracking.
 
-1. **Clone or Download the Repository**
-2. **Open the website in your browser using the link provided by Github**
-   - No build step or server required; all data is stored in your browser's localStorage.
-3. **Create a Profile**
-   - Use the "New Profile" button, set a password, and start adding calendars.
-   **Create a Calendar**
-   - Use the "New Calendar" button, enter your password for the calendar you are creating it in, set a name for your calendar, and start adding events.
-4. **Search for Events**
-   - Use the search bar at the top right. Typo-tolerant: e.g., searching "tesiting" will find "testing".
-5. **Recurring Events**
-   - When creating/editing an event, set the "Repeat" option. You can delete just one occurrence or the whole series.
+## How to Use
+
+1. **Open the App**
+   - Open `calendar-app/index.html` in your browser (no installation or server needed).
+
+2. **Create a Profile**
+   - Click "New Profile", set a password, and start organizing your life.
+
+3. **Add Calendars**
+   - Each profile can have multiple calendars. Create as many as you need (e.g., Work, Personal, School).
+
+4. **Add Events**
+   - Click on a date to add events. Set details, event color, and recurrence as needed.
+
+5. **Search, Import, Export, and Print**
+   - Use the search bar to find events quickly.
+   - Import/export events using the buttons in the header.
+   - Print your calendar for offline use.
+
+6. **Switch Themes**
+   - Use the theme toggle button to switch between dark and light mode.
 
 ## Notes
-- All data is stored locally in your browser. Clearing browser storage will erase all profiles and events.
-- For best experience, use a modern browser (Chrome, Firefox, Edge, Safari, Arc, Opera, Dia).
+- All data is stored in your browser. Clearing your browser storage will erase all profiles and events.
+- For the best experience, use a modern browser (Chrome, Firefox, Edge, Safari, Arc, Opera, etc.).
+- No internet connection is required after the first load (except for importing/exporting .ics files).
 
 ---
 
-Enjoy your calendar!
-# CalendarApp
-# CalendarApp
+Enjoy organizing your life with CalendarApp!

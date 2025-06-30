@@ -1,36 +1,45 @@
+<!-- Main HTML structure for the Calendar App -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta tags for character set and responsive design -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Calendar</title>
-    <!-- FullCalendar CSS -->
+    <!-- FullCalendar CSS for calendar UI -->
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
-    <!-- Custom CSS -->
+    <!-- Custom CSS for overall and header styling -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="header.css">
 </head>
 <body>
+  <!-- Header section: Profile, Calendar selection, Theme toggle, and Action buttons -->
   <div class="header-section">
     <div class="header-main">
       <div class="profile-controls">
+        <!-- Dropdown to select user profile -->
         <select id="profileSelect" class="header-select">
           <option value="">Select Profile</option>
         </select>
+        <!-- Dropdown to select subprofile/calendar -->
         <select id="subprofileSelect" class="header-select">
           <option value="">Select Calendar</option>
         </select>
+        <!-- Button to show all calendars -->
         <button id="showAllSubprofilesBtn" class="header-btn" style="display:none">
           <span>📅</span> Show All Calendars
         </button>
+        <!-- Button to sign out -->
         <button id="logoutBtn" class="header-btn" style="display:none">
           <span>🚪</span> Sign Out
         </button>
       </div>
+      <!-- Button to toggle between dark and light theme -->
       <button id="themeToggleBtn" class="header-btn">🌙 Dark</button>
     </div>
     
     <div class="header-actions" style="position: relative;">
+      <!-- Profile management buttons -->
       <div class="button-group">
         <button id="createProfileBtn" class="header-btn btn-primary">
           <span>➕</span> New Profile
@@ -39,6 +48,7 @@
           <span>🗑️</span> Delete Profile
         </button>
       </div>
+      <!-- Calendar management buttons -->
       <div class="button-group">
         <button id="createSubprofileBtn" class="header-btn btn-primary">
           <span>➕</span> New Calendar
@@ -47,10 +57,12 @@
           <span>🗑️</span> Delete Calendar
         </button>
       </div>
+      <!-- Export, Import, and Print buttons -->
       <div class="button-group">
         <button id="exportIcalBtn" class="header-btn">
           <span>📤</span> Export
         </button>
+        <!-- Import .ics file input and button -->
         <label style="display:inline-block;">
           <input type="file" id="importIcalFile" accept=".ics" style="display:none;">
           <button type="button" id="importIcalBtn" class="header-btn">
@@ -61,24 +73,26 @@
           <span>🖨️</span> Print
         </button>
       </div>
+      <!-- Search bar for events -->
       <div id="searchBarContainer" class="search-bar-absolute">
         <input id="eventSearchInput" type="text" placeholder="Search events..." style="width: 220px; padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px;">
         <div id="searchResults" style="background: #fff; color: #333; border: 1px solid #ccc; border-radius: 6px; margin-top: 2px; display: none; position: absolute; right: 0; width: 100%; z-index: 3000;"></div>
       </div>
     </div>
   </div>
+  <!-- Main calendar display area -->
   <div id="calendar"></div>
 
-    <!-- FullCalendar JS -->
+    <!-- FullCalendar JS library for calendar functionality -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
-     <!-- FullCalendar Plugins -->
+     <!-- FullCalendar Plugins for additional views like timeGrid -->
      <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@5.11.3/main.min.js'></script>
-    <!-- Fuse.js for fuzzy search -->
+    <!-- Fuse.js for fuzzy search in events -->
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
-    <!-- Custom JS -->
+    <!-- Custom JavaScript for app logic -->
     <script src="script.js"></script>
 
-    <!-- Add this just before </body> -->
+    <!-- Modal for creating and editing events -->
     <div id="eventModal" class="modal">
       <div class="modal-content">
         <span class="close" id="closeModal">&times;</span>
@@ -116,6 +130,7 @@
             <option value="custom">Custom...</option>
           </select>
 
+          <!-- Custom repeat options shown if 'Custom...' is selected -->
           <div id="customRepeatSection" style="display:none; margin-top:8px;">
             <label for="customRepeatType">Repeat every:</label>
             <input type="number" id="customRepeatInterval" min="1" value="1" style="width:60px; display:inline-block;"> 
@@ -136,6 +151,7 @@
         </form>
       </div>
     </div>
+    <!-- Modal for password input (used for protected actions) -->
     <div id="passwordModal" class="modal">
       <div class="modal-content">
         <span class="close" id="closePasswordModal">&times;</span>

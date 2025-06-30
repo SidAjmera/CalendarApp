@@ -1,4 +1,4 @@
-/* Header section styling */
+/* --- Header Section Styles --- */
 .header-section {
     flex-shrink: 0;
     background: #121212;
@@ -177,3 +177,9 @@ body.light-mode .button-group:not(:last-child)::after {
         border-bottom: none;
     }
 }
+
+/* --- Profile Controls Styles --- */
+
+/* --- Button Group Styles --- */
+
+/* --- Theme Toggle Button Styles --- */
